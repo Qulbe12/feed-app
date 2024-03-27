@@ -37,10 +37,9 @@ const FeedDisplayPage = () => {
                 {error ? (
                     <Text>Error: {error}</Text>
                 ) : (
-                    feeds?.map((feed) => {
+                    feeds?.map((feed, index) => {
                         return (
-
-                            <View style={styles.card}>
+                            <View style={styles.card} key={index}>
                                 <Text style={styles.heading}>Name:</Text>
                                 <Text style={styles.name}>{feed.name}</Text>
                                 <Text style={styles.heading}>Comment:</Text>
