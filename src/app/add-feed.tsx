@@ -1,20 +1,31 @@
 import React, {useState} from 'react';
-import {Button, Text, TextInput, View} from 'react-native';
-import {useNavigation} from "@react-navigation/native";
+import {ActivityIndicator, Alert, Button, Text, TextInput, View} from "react-native";
 import {axiosInstance} from "../config/axios.config";
+import {router} from "expo-router";
 
-const AddToFeedPage = () => {
+const AddFeed = () => {
     const [newEntry, setNewEntry] = useState({name: "", comment: ""});
-    const navigation = useNavigation()
+    const [loading, setLoading] = useState(false);
+
     const handleAddEntry = () => {
-        console.log('New entry added:', newEntry);
-        axiosInstance.post("add-feed", newEntry).then((value) => {
-            console.log(value.data)
-            navigation.navigate('FeedDisplay' as never);
-        }).catch((reason) => {
-            console.log(reason)
-        })
-        setNewEntry({name: "", comment: ""});
+        if (!newEntry.name.trim() || !newEntry.comment.trim()) {
+            Alert.alert("Error", "Name and comment are required.");
+            return;
+        }
+
+        setLoading(true);
+
+        axiosInstance.post("add-feed", newEntry)
+            .then((value) => {
+                router.navigate('/' as never);
+            })
+            .catch((reason) => {
+                console.log(reason);
+            })
+            .finally(() => {
+                setLoading(false);
+                setNewEntry({name: "", comment: ""});
+            });
     };
 
     return (
@@ -38,9 +49,10 @@ const AddToFeedPage = () => {
                     onChangeText={(text) => setNewEntry({...newEntry, comment: text})}
                 />
             </View>
-            <Button title="Add feed" onPress={handleAddEntry}/>
+            <Button title="Add feed" onPress={handleAddEntry} disabled={loading}/>
+            {loading && <ActivityIndicator style={{marginTop: 20}} size="large" color="#0000ff"/>}
         </View>
     );
 };
 
-export default AddToFeedPage;
+export default AddFeed;
